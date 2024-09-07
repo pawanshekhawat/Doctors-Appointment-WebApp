@@ -2,7 +2,7 @@ import React from "react";
 import { specialityData } from "../assets/assets";
 import { Link } from "react-router-dom";
 
-const SpecialityMenu = () => {
+const CategoryMenu = () => {
   return (
     <div className="flex flex-col items-center gap-4 py-16 text-gray-800" id="speciality">
       <h1 className="text-3xl font-medium">Find by Speciality</h1>
@@ -22,4 +22,4 @@ const SpecialityMenu = () => {
   );
 };
 
-export default SpecialityMenu;
+export default CategoryMenu;

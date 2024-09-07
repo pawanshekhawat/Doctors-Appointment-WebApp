@@ -1,18 +1,16 @@
 import React from "react";
 import Header from "../components/Header";
-import SpecialityMenu from "../components/SpecialityMenu";
+import CategoryMenu from "../components/CategoryMenu";
 import TopAttendee from "../components/TopAttendee";
 import Banner from "../components/banner";
-import Footer from "../components/Footer";
 
 const Home = () => {
   return (
     <div>
       <Header />
-      <SpecialityMenu />
+      <CategoryMenu />
       <TopAttendee />
       <Banner />
-      <Footer/>
     </div>
   );
 };
