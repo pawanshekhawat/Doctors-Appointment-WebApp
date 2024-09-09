@@ -25,7 +25,7 @@ const RelatedAttendee = ({ speciality, docId }) => {
       </p>
       <div className="w-full grid grid-cols-auto gap-4 pt-5 gap-y-6 px-3 sm:px-0">
         {relDoc.slice(0, 5).map((item, index) => (
-          <div
+          <div key={index}
             onClick={() => {
               navigate(`/appointment/${item._id}`);
               scrollTo(0,0);
