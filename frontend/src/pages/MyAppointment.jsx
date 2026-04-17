@@ -1,37 +1,145 @@
-import React, { useContext } from 'react';
-import { AppContext } from '../context/AppContext';
+import React, { useState, useEffect } from 'react'
+import { toast } from 'react-toastify'
+import { appointmentService } from '../services/appointmentService'
+import { useContext } from 'react'
+import { AppContext } from '../context/AppContext'
 
 const MyAppointment = () => {
-  const { doctors } = useContext(AppContext);
+  const { currencySymbol } = useContext(AppContext)
+  const [appointments, setAppointments] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [cancelling, setCancelling] = useState(null)
+
+  const token = localStorage.getItem('authToken')
+
+  const fetchAppointments = async () => {
+    if (!token) {
+      setLoading(false)
+      return
+    }
+    try {
+      const { data } = await appointmentService.getUserAppointments()
+      if (data.success) {
+        setAppointments(data.data.appointments)
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error('Failed to load appointments')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchAppointments()
+  }, [])
+
+  const handleCancel = async (appointmentId) => {
+    if (!window.confirm('Cancel this appointment?')) return
+    setCancelling(appointmentId)
+    try {
+      const { data } = await appointmentService.cancelAppointment(appointmentId)
+      if (data.success) {
+        toast.success('Appointment cancelled')
+        setAppointments(appointments.map(a =>
+          a._id === appointmentId ? { ...a, cancelled: true } : a
+        ))
+      } else {
+        toast.error(data.message)
+      }
+    } catch {
+      toast.error('Cancel failed')
+    } finally {
+      setCancelling(null)
+    }
+  }
+
+  const formatDate = (date) => {
+    if (!date) return 'N/A'
+    return new Date(date).toLocaleDateString('en-IN', {
+      day: '2-digit', month: 'short', year: 'numeric'
+    })
+  }
+
+  if (loading) return <div className='flex justify-center items-center h-64'><p>Loading...</p></div>
 
   return (
     <div>
-      <p className="pb-3 mt-12 font-medium text-zinc-700 border-b">My appointments</p>
-      <div>
-        {doctors.slice(0, 3).map((item, index) => (
-          <div className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b" key={index}>
-            <div>
-              <img className='w-32 bg-indigo-50' src={item.image} alt="" />
+      <p className='pb-3 mt-12 font-medium text-zinc-700 border-b'>My appointments</p>
+
+      {appointments.length === 0 ? (
+        <p className='text-center text-gray-400 mt-8'>No appointments found.</p>
+      ) : (
+        appointments.map((item, index) => (
+          <div
+            className='grid grid-cols-[1fr_2fr] sm:flex sm:gap-6 py-4 border-b'
+            key={index}
+          >
+            {/* Doctor Image */}
+            <div className='flex items-center'>
+              <img
+                className='w-32 bg-indigo-50 rounded-lg'
+                src={item.docId?.image || 'https://via.placeholder.com/150?text=Doctor'}
+                alt=''
+              />
             </div>
-            <div className='flex-1 text-sm text-zinc-600'>
-              <p className='text-neutral-800 font-semibold'>{item.name}</p>
-              <p>{item.speciality}</p>
-              <p className='text-zinc-700 font-medium mt-1'>Address:</p>
-              <p className='text-xs'>{item.address.line1}, {item.address.line2}</p> {/* Accessing individual properties */}
-              <p className='text-xs mt-1'>
-                <span className='text-sm text-neutral-700 font-medium'>Date & Time:</span> 25, July, 2024 | 8:30 PM
+
+            {/* Details */}
+            <div className='flex-1 text-sm'>
+              <p className='font-semibold text-zinc-800 text-base'>{item.docId?.name || 'Doctor'}</p>
+              <p className='text-zinc-500 text-xs mt-1'>
+                {item.docId?.speciality || 'General'} — {item.docId?.degree || ''}
               </p>
-            </div>
-            <div></div>
-            <div className='flex flex-col gap-2 justify-end'>
-              <button className='text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300'>Pay Online</button>
-              <button className='text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white transition-all duration-300'>Cancel Appointment</button>
+
+              <div className='mt-3 space-y-1'>
+                <p className='text-zinc-700'>
+                  <span className='font-medium text-zinc-800'>Date:</span> {formatDate(item.slotDate)}
+                </p>
+                <p className='text-zinc-700'>
+                  <span className='font-medium text-zinc-800'>Time:</span> {item.slotTime}
+                </p>
+                <p className='text-zinc-700'>
+                  <span className='font-medium text-zinc-800'>Fee:</span> {currencySymbol}{item.amount}
+                </p>
+                {item.payment === 'online' ? (
+                  <p className='text-green-600 text-xs font-medium'>Payment: Paid Online</p>
+                ) : (
+                  <p className='text-orange-500 text-xs font-medium'>Payment: Cash on Visit</p>
+                )}
+              </div>
+
+              {/* Status + Action */}
+              <div className='flex items-center gap-3 mt-4'>
+                {item.cancelled ? (
+                  <span className='px-3 py-1.5 rounded-full bg-red-100 text-red-600 text-xs font-medium'>
+                    Cancelled
+                  </span>
+                ) : item.completed ? (
+                  <span className='px-3 py-1.5 rounded-full bg-blue-100 text-blue-600 text-xs font-medium'>
+                    Completed
+                  </span>
+                ) : (
+                  <>
+                    <span className='px-3 py-1.5 rounded-full bg-green-100 text-green-600 text-xs font-medium'>
+                      Active
+                    </span>
+                    <button
+                      onClick={() => handleCancel(item._id)}
+                      disabled={cancelling === item._id}
+                      className='px-3 py-1.5 rounded-full border border-red-300 text-red-500 text-xs hover:bg-red-50 transition-colors disabled:opacity-50'
+                    >
+                      {cancelling === item._id ? 'Cancelling...' : 'Cancel Appointment'}
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
-        ))}
-      </div>
+        ))
+      )}
     </div>
-  );
-};
+  )
+}
 
-export default MyAppointment;
+export default MyAppointment

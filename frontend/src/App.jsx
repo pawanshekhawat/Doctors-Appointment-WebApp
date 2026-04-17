@@ -8,6 +8,8 @@ import Login from "./pages/Login";
 import MyProfile from "./pages/MyProfile";
 import MyAppointment from "./pages/MyAppointment";
 import Appointment from "./pages/Appointment";
+import AdminDashboard from "./pages/AdminDashboard";
+import DoctorDashboard from "./pages/DoctorDashboard";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
@@ -26,6 +28,8 @@ const App = () => {
           <Route path="/myprofile" element={<MyProfile />} />
           <Route path="/myappointments" element={<MyAppointment />} />
           <Route path="/appointment/:docId" element={<Appointment />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
         </Routes>
         <Footer/>
       </div>

@@ -5,18 +5,24 @@ export const AppContext = createContext();
 
 const AppContextProvider = (props) => {
 
-  const currencySymbol = '$'
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
+    const currencySymbol = '$';
 
-  const value = {
-    doctors,
-    currencySymbol
-  };
+    // Get token from localStorage
+    const getToken = () => localStorage.getItem('authToken');
 
-  return (
-    <AppContext.Provider value={value}>
-        {props.children}
-    </AppContext.Provider>
-  )
+    const value = {
+        doctors,
+        currencySymbol,
+        backendUrl,
+        getToken,
+    };
+
+    return (
+        <AppContext.Provider value={value}>
+            {props.children}
+        </AppContext.Provider>
+    );
 };
 
 export default AppContextProvider;
