@@ -22,7 +22,7 @@ const bookAppointment = async (req, res) => {
             slotDate,
             slotTime,
             amount,
-            payment: 'cash',
+            payment: false,
         });
 
         await appointment.save();

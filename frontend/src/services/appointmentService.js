@@ -10,6 +10,10 @@ export const appointmentService = {
         api.put(`/api/appointment/cancel-by-doctor/${appointmentId}`),
     completeAppointment: (appointmentId) =>
         api.put(`/api/appointment/complete/${appointmentId}`),
+    createOrder: (appointmentId) =>
+        api.post('/api/razorpay/create-order', { appointmentId }),
+    verifyPayment: (data) =>
+        api.put('/api/razorpay/verify-payment', data),
 };
 
 export default appointmentService;

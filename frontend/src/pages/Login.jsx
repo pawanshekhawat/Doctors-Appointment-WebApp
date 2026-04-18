@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import { authService } from '../services/authService';
 import { AppContext } from '../context/AppContext';
 
@@ -26,6 +26,7 @@ const Login = () => {
             localStorage.setItem('authToken', data.data.token);
             localStorage.setItem('userRole', 'user');
             localStorage.setItem('userName', name);
+            window.dispatchEvent(new Event('authchange'));
             toast.success('Account created successfully!');
             navigate('/');
           } else {
@@ -37,6 +38,7 @@ const Login = () => {
             localStorage.setItem('authToken', data.data.token);
             localStorage.setItem('userRole', 'user');
             localStorage.setItem('userName', data.data.user.name);
+            window.dispatchEvent(new Event('authchange'));
             toast.success('Login successful!');
             navigate('/');
           } else {
@@ -50,6 +52,7 @@ const Login = () => {
           localStorage.setItem('userRole', 'doctor');
           localStorage.setItem('userName', data.data.doctor.name);
           localStorage.setItem('doctorId', data.data.doctor.id);
+          window.dispatchEvent(new Event('authchange'));
           toast.success('Doctor login successful!');
           navigate('/doctor-dashboard');
         } else {
@@ -61,6 +64,7 @@ const Login = () => {
           localStorage.setItem('authToken', data.data.token);
           localStorage.setItem('userRole', 'admin');
           localStorage.setItem('userName', 'Admin');
+          window.dispatchEvent(new Event('authchange'));
           toast.success('Admin login successful!');
           navigate('/admin-dashboard');
         } else {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { doctorService } from "../services/doctorService";
 import { appointmentService } from "../services/appointmentService";
 import { assets } from "../assets/assets";
@@ -83,19 +83,12 @@ const Appointment = () => {
     getAvailableSlots();
   }, [docInfo]);
 
-  // Fetch booked slots for this doctor
+  // Fetch booked slots for this doctor (public endpoint - no token needed)
   const fetchBookedSlots = async () => {
     try {
-      const { data } = await appointmentService.getDoctorAppointments();
+      const { data } = await doctorService.getDoctorSlots(docId);
       if (data.success) {
-        const booked = {};
-        data.data.appointments.forEach((apt) => {
-          if (!apt.cancelled) {
-            const key = `${apt.slotDate}_${apt.slotTime}`;
-            booked[key] = true;
-          }
-        });
-        setBookedSlots(booked);
+        setBookedSlots(data.data.slots_booked || {});
       }
     } catch {
       // Silently fail — slots will just show unblocked
@@ -110,7 +103,7 @@ const Appointment = () => {
 
   const isSlotBooked = (date, time) => {
     const dateStr = date.toISOString().split("T")[0];
-    return bookedSlots[`${dateStr}_${time}`];
+    return Boolean(bookedSlots[dateStr]?.[time]);
   };
 
   const handleBooking = async () => {

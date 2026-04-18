@@ -65,4 +65,18 @@ const getRelatedDoctors = async (req, res) => {
     }
 };
 
-export { getAllDoctors, getDoctorById, getRelatedDoctors };
+// GET /api/doctor/slots/:doctorId — public, returns booked slots for booking UI
+const getDoctorSlots = async (req, res) => {
+    try {
+        const { doctorId } = req.params;
+        const doctor = await doctorModel.findById(doctorId).select('slots_booked');
+        if (!doctor) {
+            return res.json({ success: false, message: 'Doctor not found' });
+        }
+        res.json({ success: true, data: { slots_booked: doctor.slots_booked || {} } });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+};
+
+export { getAllDoctors, getDoctorById, getRelatedDoctors, getDoctorSlots };

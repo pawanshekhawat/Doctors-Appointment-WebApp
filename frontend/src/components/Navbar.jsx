@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { assets } from "../assets/assets";
 import { NavLink, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -17,6 +17,14 @@ const Navbar = () => {
     setToken(storedToken);
     setUserRole(storedRole);
     setUserName(storedName);
+
+    const handleAuthChange = () => {
+      setToken(!!localStorage.getItem('authToken'));
+      setUserRole(localStorage.getItem('userRole') || '');
+      setUserName(localStorage.getItem('userName') || '');
+    };
+    window.addEventListener('authchange', handleAuthChange);
+    return () => window.removeEventListener('authchange', handleAuthChange);
   }, []);
 
   const handleLogout = () => {

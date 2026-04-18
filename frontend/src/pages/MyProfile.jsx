@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { toast } from 'react-toastify'
+import toast from 'react-hot-toast'
 import { authService } from '../services/authService'
 import { assets } from '../assets/assets'
 

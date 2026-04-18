@@ -7,16 +7,15 @@ import {
     getDoctorAppointments,
     completeAppointment,
 } from '../controllers/appointmentController.js';
-import authMiddleware from '../middleware/authMiddleware.js';
+import authMiddleware, { requireRole } from '../middleware/authMiddleware.js';
 
 const appointmentRouter = express.Router();
 
-// All routes protected
-appointmentRouter.post('/book', authMiddleware, bookAppointment);
-appointmentRouter.get('/user-appointments', authMiddleware, getUserAppointments);
-appointmentRouter.put('/cancel/:appointmentId', authMiddleware, cancelAppointment);
-appointmentRouter.put('/cancel-by-doctor/:appointmentId', authMiddleware, cancelByDoctor);
-appointmentRouter.get('/doctor-appointments', authMiddleware, getDoctorAppointments);
-appointmentRouter.put('/complete/:appointmentId', authMiddleware, completeAppointment);
+appointmentRouter.post('/book', authMiddleware, requireRole('user'), bookAppointment);
+appointmentRouter.get('/user-appointments', authMiddleware, requireRole('user'), getUserAppointments);
+appointmentRouter.put('/cancel/:appointmentId', authMiddleware, requireRole('user'), cancelAppointment);
+appointmentRouter.put('/cancel-by-doctor/:appointmentId', authMiddleware, requireRole('doctor'), cancelByDoctor);
+appointmentRouter.get('/doctor-appointments', authMiddleware, requireRole('doctor'), getDoctorAppointments);
+appointmentRouter.put('/complete/:appointmentId', authMiddleware, requireRole('doctor'), completeAppointment);
 
 export default appointmentRouter;

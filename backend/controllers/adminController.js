@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt'
 import validator from "validator"
 import jwt from "jsonwebtoken"
 import { v2 as cloudinary } from "cloudinary"
@@ -118,7 +119,7 @@ const addDoctor = async (req, res) => {
         res.json({ success: true, message: "Doctor Added" })
 
     } catch (error) {
-        console.log(error);
+        console.log('Add doctor error:', error)
         res.json({ success: false, message: error.message })
     }
 }

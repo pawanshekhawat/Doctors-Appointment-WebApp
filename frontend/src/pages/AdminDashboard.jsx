@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { toast } from 'react-toastify'
+import toast from 'react-hot-toast'
 import api from '../utils/axios'
-import { assets } from '../assets/assets'
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard')

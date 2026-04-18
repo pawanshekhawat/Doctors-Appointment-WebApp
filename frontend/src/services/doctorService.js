@@ -8,6 +8,8 @@ export const doctorService = {
         api.get(`/api/doctor/${doctorId}`),
     getRelatedDoctors: (doctorId) =>
         api.get(`/api/doctor/related/${doctorId}`),
+    getDoctorSlots: (doctorId) =>
+        api.get(`/api/doctor/slots/${doctorId}`),
 
     // Doctor dashboard (protected)
     getDashboard: () => api.get('/api/doctor/dashboard'),

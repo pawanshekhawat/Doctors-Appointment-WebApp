@@ -1,12 +1,21 @@
 import mongoose from 'mongoose';
-import dns from 'dns';
-
-// Force DNS to use Google DNS (8.8.8.8) to bypass ISP blocking
-dns.setServers(['8.8.8.8']);
 
 const connectDB = async () => {
+    const mongoUri = process.env.MONGODB_URI?.trim().replace(/^['"]|['"]$/g, '');
+
+    if (!mongoUri) {
+        throw new Error('MONGODB_URI is not configured');
+    }
+
     mongoose.connection.on('connected', () => console.log('Database Connected'));
-    await mongoose.connect(process.env.MONGODB_URI);
-}
+    mongoose.connection.on('error', (error) => {
+        console.error('MongoDB connection error:', error.message);
+    });
+
+    await mongoose.connect(mongoUri, {
+        serverSelectionTimeoutMS: 10000,
+        socketTimeoutMS: 45000,
+    });
+};
 
 export default connectDB;
