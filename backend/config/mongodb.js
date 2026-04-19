@@ -1,21 +1,28 @@
 import mongoose from 'mongoose';
 
-const connectDB = async () => {
-    const mongoUri = process.env.MONGODB_URI?.trim().replace(/^['"]|['"]$/g, '');
+let cached = global.mongooseCache || (global.mongooseCache = { conn: null, promise: null });
 
-    if (!mongoUri) {
-        throw new Error('MONGODB_URI is not configured');
+export default async function connectDB() {
+    if (cached.conn) return cached.conn;
+
+    if (!cached.promise) {
+        const uri = process.env.MONGODB_URI?.trim();
+        if (!uri) throw new Error('MONGODB_URI is not set');
+
+        mongoose.connection.on('connected', () => console.log('DB Connected'));
+        mongoose.connection.on('error', (err) => console.error('DB Error:', err.message));
+
+        cached.promise = mongoose.connect(uri, {
+            serverSelectionTimeoutMS: 10000,
+            socketTimeoutMS: 45000,
+        }).then((conn) => { cached.conn = conn; return conn; });
     }
 
-    mongoose.connection.on('connected', () => console.log('Database Connected'));
-    mongoose.connection.on('error', (error) => {
-        console.error('MongoDB connection error:', error.message);
-    });
+    cached.conn = await cached.promise;
+    return cached.conn;
+}
 
-    await mongoose.connect(mongoUri, {
-        serverSelectionTimeoutMS: 10000,
-        socketTimeoutMS: 45000,
-    });
-};
-
-export default connectDB;
+// Also expose at module level for convenience
+export async function getDB() {
+    return connectDB();
+}
