@@ -2,6 +2,7 @@ import 'dotenv/config.js'
 import express from 'express'
 import cors from 'cors'
 import mongoose from 'mongoose'
+import connectDB from './config/mongodb.js'
 import adminRouter from './routes/adminRoute.js'
 import userRouter from './routes/userRoute.js'
 import doctorRouter from './routes/doctorRoute.js'
@@ -42,16 +43,11 @@ app.use((err, req, res, next) => {
     res.status(err.status || 500).json({ success: false, message: err.message })
 })
 
-// MongoDB + start — graceful failure (doesn't crash the serverless function)
-mongoose.connect(process.env.MONGODB_URI || '')
-    .then(() => {
-        console.log('DB Connected')
-        const PORT = process.env.PORT || 4000
-        app.listen(PORT, () => console.log(`Server on port ${PORT}`))
-    })
-    .catch((err) => {
-        console.error('DB connection failed:', err.message)
-        // Function stays alive — Vercel can still respond to / route
-    })
+await connectDB()
 
-module.exports = app
+if (!process.env.VERCEL) {
+    const PORT = process.env.PORT || 4000
+    app.listen(PORT, () => console.log(`Server on port ${PORT}`))
+}
+
+export default app
