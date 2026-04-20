@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import validator from "validator"
 import jwt from "jsonwebtoken"
 import { v2 as cloudinary } from "cloudinary"

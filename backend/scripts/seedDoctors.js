@@ -4,7 +4,7 @@ dotenv.config({ path: './.env' });
 import dns from 'dns';
 dns.setServers(['8.8.8.8']);
 import doctorModel from '../models/doctorModel.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 const doctors = [
     { name: 'Dr. Richard James', image: 'https://res.cloudinary.com/dmqwd5jcq/image/upload/v1/doctors/doc1', speciality: 'General physician', degree: 'MBBS', experience: '4 Years', about: 'Dr. Davis has a strong commitment to delivering comprehensive medical care, focusing on preventive medicine, early diagnosis, and effective treatment strategies.', fees: 50, address: { line1: '17th Cross, Richmond', line2: 'Circle, Ring Road, London' } },
